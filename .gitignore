@@ -1,0 +1,11 @@
+# visual studio files
+/Nerd's Teaser Bot/bin
+/Nerd's Teaser Bot/obj
+/.vs
+
+*.csproj
+*.sln
+
+# personal stuff
+/Nerd's Teaser Bot/Imports
+/Nerd's Teaser Bot/Misc/Hidden.cs
