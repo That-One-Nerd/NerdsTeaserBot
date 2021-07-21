@@ -3,6 +3,8 @@
 /Nerd's Teaser Bot/obj
 /.vs
 
+.editorconfig
+
 *.csproj
 *.sln
 
