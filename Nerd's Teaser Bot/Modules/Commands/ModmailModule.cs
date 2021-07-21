@@ -403,7 +403,7 @@ namespace NerdsTeaserBot.Modules.Commands
             if (message is SocketUserMessage msg)
             {
                 if (msg.Author.Id == ID) return;
-                if (msg.Content.Trim().StartsWith(";") || msg.Content.Trim().StartsWith("n;") || msg.Content.Trim().StartsWith("m;")) return;
+                if (msg.Content.Trim().StartsWith(";") || msg.Content.Trim().StartsWith("n;") || msg.Content.Trim().StartsWith("m;") || msg.Content.Trim().StartsWith(Data.misc.Data.prefix)) return;
 
                 EmbedBuilder e;
 
@@ -482,7 +482,7 @@ namespace NerdsTeaserBot.Modules.Commands
                         if (count != 1) s += "s";
                         e.AddField("Warn Count", Code(count + " Warn" + s), true);
 
-                        await ch.SendMessageAsync("", false, e.Build());
+                        await ch.SendMessageAsync(cat.Guild.EveryoneRole.Mention, false, e.Build());
                         await ch.SyncPermissionsAsync();
                         await SuccessModMailMessage(await msg.Author.GetOrCreateDMChannelAsync(), true);
                     }

@@ -279,33 +279,6 @@ namespace NerdsTeaserBot.Modules.Commands
             await ReplyAsync("", false, e.Build());
         }
 
-        [Command("leave")]
-        [RequireOwner]
-        [Summary("Runs through all servers the bot is in and checks them to the list of approved servers.")]
-        public async Task Leave()
-        {
-            List<SocketGuild> left = new();
-            foreach (SocketGuild g in Context.Client.Guilds) if (await PermittedServerHandler(g)) left.Add(g);
-
-            if (left.Length == 0)
-            {
-                LogModule.LogMessage(LogSeverity.Error, "No Servers Left");
-                return;
-            }
-
-            EmbedBuilder e = new()
-            {
-                Color = Colors.DefaultColor,
-                Description = "",
-                Timestamp = DateTime.Now,
-                Title = "Left " + left.Length + " Unapproved Servers",
-            };
-
-            foreach (SocketGuild g in left) e.Description += Code(g.Name) + " (Owner: <@" + g.Id + ">)";
-
-            await ReplyAsync("", false, e.Build());
-        }
-
         [Command("ping")]
         [Summary("Pings the bot, and returns helpful info about that ping")]
         public async Task Ping()
@@ -328,6 +301,30 @@ namespace NerdsTeaserBot.Modules.Commands
             await ReplyAsync("", false, e.Build());
         }
 
+        [Command("serverlist")]
+        [RequireOwner]
+        [Summary("Shows a list of all servers the bot is currently in")]
+        public async Task Serverlist()
+        {
+            List<SocketGuild> guilds = new(Context.Client.Guilds);
+
+            EmbedBuilder e = new()
+            {
+                Color = Colors.DefaultColor,
+                Description = "",
+                Timestamp = DateTime.Now,
+                Title = "This Bot is in " + guilds.Length + " Servers",
+            };
+
+            foreach (SocketGuild guild in guilds)
+            {
+                if (!guild.HasAllMembers) await guild.DownloadUsersAsync();
+                e.Description += Bold(Code(guild.Name)) + Italics(Code("(" + guild.Id + ")")) + " - Owned by " + guild.Owner.Mention + " and has " + Code(guild.MemberCount + " Member" + (guild.MemberCount == 1 ? "" : "s")) + "\n";
+            }
+
+            await ReplyAsync("", false, e.Build());
+        }
+
         [Command("test")]
         [Summary("Does whatever is currently being tested")]
         public async Task Test()
@@ -337,25 +334,22 @@ namespace NerdsTeaserBot.Modules.Commands
 
         // end commands
 
-        public static async Task<bool> PermittedServerHandler(SocketGuild guild)
+        public static async Task ServerJoinedDMHandler(SocketGuild guild)
         {
-            bool not = !Data.misc.Data.allowedServers.Contains(guild.Id);
+            if (!guild.HasAllMembers) await guild.DownloadUsersAsync();
 
-            if (not)
+            EmbedBuilder e = new()
             {
-                EmbedBuilder e = new()
-                {
-                    Color = Color.Red,
-                    Description = "This server is not a part of the list of approved servers. Please come into contact with <@478210457816006666> to add it",
-                    Timestamp = DateTime.Now,
-                    Title = "Server Cannot be Joined",
-                };
+                Color = Colors.DefaultColor,
+                Description = "<@" + ID + "> has joined " + Bold(Code(guild.Name)) + ". More info is below:\n\n" +
+                              "Member Count: " + Code(guild.MemberCount + " Member" + (guild.MemberCount == 1 ? "" : "s")) + "\n" +
+                              "Owner: " + guild.Owner.Mention + " " + Bold("(" + guild.Owner.Username + "#" + guild.Owner.Discriminator + ")") + "\n" +
+                              "Server ID: " + Code(guild.Id.ToString()),
+                Timestamp = DateTime.Now,
+                Title = "Joined New Server",
+            };
 
-                await guild.DefaultChannel.SendMessageAsync("", false, e.Build());
-                await guild.LeaveAsync();
-            }
-
-            return not;
+            await (await Internals.client.GetApplicationInfoAsync()).Owner.SendMessageAsync("", false, e.Build());
         }
     }
 }

@@ -9,6 +9,7 @@ namespace NerdsTeaserBot.Modules
 {
     public static class HandlesModule
     {
+        internal static Func<SocketUserMessage, Task> OnAnyUserMessageRecieved;
         internal static Func<SocketUserMessage, Task> OnUserMessageRecieved;
     }
 }

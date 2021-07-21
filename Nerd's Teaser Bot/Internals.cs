@@ -78,7 +78,7 @@ namespace NerdsTeaserBot
 
             client.InteractionCreated += ButtonModule.ButtonHandler;
 
-            client.JoinedGuild += BotModule.PermittedServerHandler;
+            client.JoinedGuild += BotModule.ServerJoinedDMHandler;
 
             client.Log += LogHandler;
 
@@ -113,7 +113,8 @@ namespace NerdsTeaserBot
 
             HandlesModule.OnUserMessageRecieved += LevelModule.LevelHandler;
             HandlesModule.OnUserMessageRecieved += TagModule.TagHandler;
-            HandlesModule.OnUserMessageRecieved += VariableModule.AutopublishHandler;
+
+            HandlesModule.OnAnyUserMessageRecieved += VariableModule.AutopublishHandler;
         }
 
         internal static void LoadBackground()
@@ -135,14 +136,19 @@ namespace NerdsTeaserBot
             {
                 message = msg;
                 context = new SocketCommandContext(client, message);
-
-                if (message.Author.Id == ID || message.Channel.GetType() == typeof(SocketDMChannel)) return;
+                if (message.Channel.GetType() == typeof(SocketDMChannel)) return;
 
                 Data.TryLoadAll(context.Guild.Id);
 
                 if (!context.Guild.HasAllMembers) await context.Guild.DownloadUsersAsync();
 
                 int argPos = 0;
+
+                if (message.Author.Id == ID)
+                {
+                    await HandlesModule.OnAnyUserMessageRecieved.Invoke(message);
+                    return;
+                }
 
                 if (message.HasStringPrefix(Data.misc.Data.prefix, ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos))
                 {
@@ -152,6 +158,7 @@ namespace NerdsTeaserBot
                     Log.Write(LogItem(context.User) + " has executed command: '" + message.Content + "'");
                 }
 
+                await HandlesModule.OnAnyUserMessageRecieved.Invoke(message);
                 await HandlesModule.OnUserMessageRecieved.Invoke(message);
 
                 Data.SaveAll(context.Guild.Id);

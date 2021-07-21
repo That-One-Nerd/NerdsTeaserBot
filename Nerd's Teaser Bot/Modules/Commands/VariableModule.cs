@@ -232,61 +232,6 @@ namespace NerdsTeaserBot.Modules.Commands
             await ReplyAsync("", false, e.Build());
         }
 
-        [Command("serverlist add")]
-        [RequireOwner]
-        [Summary("Adds a server to the list of approved servers to join")]
-        public async Task ServerlistAdd([Summary("The ID of the server you would like to add")] ulong id)
-        {
-            EmbedBuilder e = new()
-            {
-                Color = Colors.DefaultColor,
-                Description = "The bot is now allowed to enter the server with the ID of " + Italics(Code(id.ToString())),
-                Timestamp = DateTime.Now,
-                Title = "Approved Server",
-            };
-
-            Data.misc.Data.allowedServers.Add(id);
-
-            await ReplyAsync("", false, e.Build());
-        }
-
-        [Command("serverlist list")]
-        [Summary("Shows the list of approved servers to join")]
-        public async Task ServerlistList()
-        {
-            EmbedBuilder e = new()
-            {
-                Color = Colors.DefaultColor,
-                Description = "",
-                Timestamp = DateTime.Now,
-                Title = Data.misc.Data.allowedServers.Length + " Approved Server ID",
-            };
-
-            if (Data.misc.Data.allowedServers.Length != 1) e.Title += "s";
-
-            foreach (ulong u in Data.misc.Data.allowedServers) e.Description += Italics(Code(u.ToString())) + "\n";
-
-            await ReplyAsync("", false, e.Build());
-        }
-
-        [Command("serverlist remove")]
-        [RequireOwner]
-        [Summary("Removes a server from the list of approved servers to join")]
-        public async Task ServerlistRemove([Summary("The ID of the server you would like to remove")] ulong id)
-        {
-            EmbedBuilder e = new()
-            {
-                Color = Color.Red,
-                Description = "The bot will no longer be permitted to enter a server with the ID of " + Italics(Code(id.ToString())),
-                Timestamp = DateTime.Now,
-                Title = "Server Prohibited",
-            };
-            
-            Data.misc.Data.allowedServers.Remove(id);
-
-            await ReplyAsync("", false, e.Build());
-        }
-
         // handles
 
         public static async Task AutopublishHandler(SocketUserMessage msg)

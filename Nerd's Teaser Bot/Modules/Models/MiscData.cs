@@ -7,7 +7,6 @@ namespace NerdsTeaserBot.Modules.Models
     public class MiscData
     {
         public List<ulong> announceChannels = new();
-        public List<ulong> allowedServers = new();
         public ulong changelogChannel;
         public int levelCooldown = 60;
         public bool levelMention;
